@@ -3,13 +3,34 @@ defmodule Mastery.Core.Question do
 
   defstruct ~w[asked substitutions template]a
 
+  @doc """
+  Generate a question from a template.
+
+    ## Example
+    iex> generator = %{left: [1, 1], right: [2, 2]}
+    iex> checker = fn(sub, answer) ->
+    ...> sub[:left] + sub[:right] == String.to_integer(answer)
+    ...> end
+    iex> template = Mastery.Core.Template.new(
+    ...> name: :single_digit_addition,
+    ...> category: :addition,
+    ...> instructions: "Add the numbers",
+    ...> raw: "<%= @left %> + <%= @right %>",
+    ...> generators: generator,
+    ...> checker: checker)
+    iex> question = Mastery.Core.Question.new(template)
+    iex> question.asked
+    "1 + 2"
+    iex> question.substitutions
+    [left: 1, right: 2]
+  """
   def new(%Template{} = template) do
     template.generators
     |> Enum.map(&build_substitution/1)
     |> evaluate(template)
   end
 
-  def build_substitution({name, choices_or_generator}) do
+  defp build_substitution({name, choices_or_generator}) do
     {name, choose(choices_or_generator)}
   end
 
@@ -21,12 +42,6 @@ defmodule Mastery.Core.Question do
     generator.()
   end
 
-  defp compile(template, substitutions) do
-    template.compiled
-    |> Code.eval_quoted(assigns: substitutions)
-    |> elem(0)
-  end
-
   defp evaluate(substitutions, template) do
     %__MODULE__{
       asked: compile(template, substitutions),
@@ -34,4 +49,11 @@ defmodule Mastery.Core.Question do
       template: template
     }
   end
+
+  defp compile(template, substitutions) do
+    template.compiled
+    |> Code.eval_quoted(assigns: substitutions)
+    |> elem(0)
+  end
+
 end

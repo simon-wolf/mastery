@@ -36,7 +36,7 @@ defmodule Mastery.Core.Quiz do
     quiz
     |> pick_current_question
     |> move_template(:used)
-    |> reset_templace_cycle
+    |> reset_template_cycle
   end
 
   defp pick_current_question(quiz) do
@@ -87,7 +87,7 @@ defmodule Mastery.Core.Quiz do
     Map.put(quiz, field, [template | list])
   end
 
-  defp reset_templace_cycle(%{templates: templates, used: used} = quiz)
+  defp reset_template_cycle(%{templates: templates, used: used} = quiz)
        when map_size(templates) == 0 do
     %__MODULE__{
       quiz
@@ -96,7 +96,7 @@ defmodule Mastery.Core.Quiz do
     }
   end
 
-  defp reset_templace_cycle(quiz), do: quiz
+  defp reset_template_cycle(quiz), do: quiz
 
   def answer_question(quiz, %Response{correct: true} = response) do
     new_quiz =

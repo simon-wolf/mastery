@@ -14,6 +14,49 @@ defmodule Mastery.Core.Quiz do
     struct!(__MODULE__, fields)
   end
 
+  @doc """
+  Creates a new template.
+
+    ## Example
+    iex> simple_generator = %{left: [1, 2], right: [1, 2]}
+    iex> intermediate_generator = %{left: [11, 12], right: [11, 12]}
+    iex> addition_checker = fn(sub, answer) ->
+    ...> sub[:left] + sub[:right] == String.to_integer(answer)
+    ...> end
+    iex> subtraction_checker = fn(sub, answer) ->
+    ...> sub[:left] - sub[:right] == String.to_integer(answer)
+    ...> end
+    iex> simple_addition_fields = [
+    ...> name: :single_digit_addition,
+    ...> category: :addition,
+    ...> instructions: "Add the numbers",
+    ...> raw: "<%= @left %> + <%= @right %>",
+    ...> generators: simple_generator,
+    ...> checker: addition_checker]
+    iex> intermediate_addition_fields = [
+    ...> name: :double_digit_addition,
+    ...> category: :addition,
+    ...> instructions: "Add the numbers",
+    ...> raw: "<%= @left %> + <%= @right %>",
+    ...> generators: intermediate_generator,
+    ...> checker: addition_checker]
+    iex> simple_subtraction_fields = [
+    ...> name: :single_digit_subtraction,
+    ...> category: :subtraction,
+    ...> instructions: "Subtract the numbers",
+    ...> raw: "<%= @left %> - <%= @right %>",
+    ...> generators: simple_generator,
+    ...> checker: subtraction_checker]
+    iex> quiz = Mastery.Core.Quiz.new(title: "Maths", mastery: 3)
+    iex> quiz = Mastery.Core.Quiz.add_template(quiz, simple_addition_fields)
+    iex> quiz = Mastery.Core.Quiz.add_template(quiz, intermediate_addition_fields)
+    iex> quiz = Mastery.Core.Quiz.add_template(quiz, simple_subtraction_fields)
+    iex> Map.keys(quiz.templates)
+    [:addition, :subtraction]
+    iex> quiz = Mastery.Core.Quiz.select_question(quiz)
+    iex> quiz.current_question.asked
+    "1 + 2"
+  """
   def add_template(quiz, fields) do
     template = Template.new(fields)
 

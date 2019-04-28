@@ -55,5 +55,4 @@ defmodule Mastery.Core.Question do
     |> Code.eval_quoted(assigns: substitutions)
     |> elem(0)
   end
-
 end
